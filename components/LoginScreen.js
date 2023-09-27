@@ -7,11 +7,39 @@ import { getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword } fro
 import { initializeApp } from 'firebase/app'
 import { firebaseConfig } from "../firebaseConfig";
 
-export default function LoginScreen(){
+export default function LoginScreen(navigation) {
     const [email,setEmmail] = useState('');
     const [password,setPassword] = useState('');
     const [message,setMessage] = useState('');
     const [showPass,setShowPass] = useState(false)
+
+    // Definir constantes para la autenticación
+    const app = initializeApp(firebaseConfig)
+    const auth = getAuth(app)
+
+    // Metodos para crear cuenta en Firebase Authentication y SignIn
+    const handleCreateAccount = () => {
+        createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential)=>{
+            //console.log(userCredential.user.providerData)
+            setMessage("Cuenta creada correctamente...")
+        })
+        .catch((error) => {
+            //console.log(error.message)
+            setMessage("Error al crear la cuenta... Intentelo de nuevo")
+        })
+    }
+
+    const handleSignIn = () => {
+        signInWithEmailAndPassword(auth,email,password)
+        .then((userCredential)=>{
+            console.log("Conexion exitosa...")
+            navigation.navigate('Home',{email: email, password: password})
+        })
+        .catch((error) => {
+            console.log(error.message)
+    })
+}
     
     return(
         <View style={styles.container}>
@@ -39,7 +67,7 @@ export default function LoginScreen(){
                     style={{ marginTop: 20, backgroundColor: 'orange' }}
                     icon="login"
                     mode="outlined"
-                    // onPress={handleSignIn}
+                    onPress={handleSignIn}
                 >
                     Iniciar Sesión
                 </Button>
@@ -47,7 +75,7 @@ export default function LoginScreen(){
                     style={{ marginTop: 20, backgroundColor: 'yellow' }}
                     icon="account"
                     mode="outlined"
-                    // onPress={handleCreateAccount}
+                    onPress={handleCreateAccount}
                 >
                     Crear Cuenta
                 </Button>
