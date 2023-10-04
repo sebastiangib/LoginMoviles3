@@ -7,11 +7,12 @@ import { getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword } fro
 import { initializeApp } from 'firebase/app'
 import { firebaseConfig } from "../firebaseConfig";
 
-export default function LoginScreen(navigation) {
+export default function LoginScreen({navigation}) {
     const [email,setEmmail] = useState('');
     const [password,setPassword] = useState('');
     const [message,setMessage] = useState('');
     const [showPass,setShowPass] = useState(false)
+    const [messageColor,setMessageColor] = useState(true)
 
     // Definir constantes para la autenticación
     const app = initializeApp(firebaseConfig)
@@ -22,11 +23,13 @@ export default function LoginScreen(navigation) {
         createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential)=>{
             //console.log(userCredential.user.providerData)
+            setMessageColor(true)
             setMessage("Cuenta creada correctamente...")
         })
         .catch((error) => {
             //console.log(error.message)
             setMessage("Error al crear la cuenta... Intentelo de nuevo")
+            setMessageColor(false)
         })
     }
 
@@ -34,10 +37,12 @@ export default function LoginScreen(navigation) {
         signInWithEmailAndPassword(auth,email,password)
         .then((userCredential)=>{
             console.log("Conexion exitosa...")
-            navigation.navigate('Home',{email: email, password: password})
+            navigation.navigate('Home',{email:email})
         })
         .catch((error) => {
-            console.log(error.message)
+            //console.log(error.message)
+            setMessage("Usuario o contraseña invalido...")
+            setMessageColor(false)
     })
 }
     
@@ -79,7 +84,7 @@ export default function LoginScreen(navigation) {
                 >
                     Crear Cuenta
                 </Button>
-                <Text style={{color:'green'}}>{message}</Text>
+                <Text style={{marginTop:5,color:messageColor ? 'green' : 'red'}}>{message}</Text>
             </View>
         </View>
     );
